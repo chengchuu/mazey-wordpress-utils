@@ -1,4 +1,4 @@
-# File&Cache
+# File & Cache
 .DS_Store
 node_modules/
 dist/
@@ -13,10 +13,11 @@ doc/
 undefined/
 temp/
 package-lock.json
+lib/
+pnpm-lock.yaml
 
 # Editor directories and files
 .idea
-# .vscode
 *.suo
 *.ntvs*
 *.njsproj
