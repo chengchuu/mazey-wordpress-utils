@@ -13,6 +13,7 @@ doc/
 undefined/
 temp/
 package-lock.json
+lib/
 
 # Editor directories and files
 .idea
