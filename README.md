@@ -6,7 +6,7 @@
 [npm-image]: https://img.shields.io/npm/v/mazey-wordpress-utils
 [npm-url]: https://npmjs.org/package/mazey-wordpress-utils
 [l-image]: https://img.shields.io/npm/l/mazey-wordpress-utils
-[l-url]: https://github.com/mazeyqian/mazey-wordpress-utils
+[l-url]: https://github.com/chengchuu/mazey-wordpress-utils
 
 WordPress utilities.
 

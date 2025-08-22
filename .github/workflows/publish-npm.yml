@@ -67,7 +67,7 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node scripts/change-package-name.js "@${{ github.actor }}/mazey-npm-template"
+          node scripts/change-package-name.js "@${{ github.actor }}/mazey-wordpress-utils"
           npm publish --registry=https://npm.pkg.github.com/
 
       - name: Restore modified files
