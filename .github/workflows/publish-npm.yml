@@ -4,14 +4,12 @@ env:
   NODE_VERSION: '14'
 
 on:
-  push:
+  pull_request: # Test
     branches:
       - main
-      - 'release/v*'
-  pull_request:
+  push: # Publish
     branches:
       - main
-      - 'release/v*'
   workflow_dispatch:
 
 jobs:

@@ -78,6 +78,14 @@ For an image with the URL `<img src="https://example.com/image.png?width=400rem&
 
 ## Contributing
 
+### Development Environment
+
+| Dependency | Version                      |
+|------------|------------------------------|
+| Node.js    | v14.21.3                     |
+
+### Scripts
+
 ```bash
 # dev
 npm run dev

@@ -11,6 +11,8 @@ export function setCopyBtnForAllTagP(): boolean {
   const allTagP = document.querySelectorAll('.entry-content p');
   if (!allTagP || allTagP.length === 0) return false;
   allTagP.forEach(p => {
+    // pass if class = ez-toc-title
+    if (p.classList.contains('ez-toc-title')) return;
     const text = p.innerText;
     const btn = document.createElement('button');
     btn.innerText = 'Copy';
