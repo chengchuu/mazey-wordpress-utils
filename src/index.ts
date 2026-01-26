@@ -1,5 +1,12 @@
-import { throttle } from 'mazey';
+import { throttle, genCustomConsole, isNonEmptyArray } from 'mazey';
 import copy from 'copy-to-clipboard';
+
+const wpCon = genCustomConsole('[Mazey WP Utils]');
+
+const defaultCopyOptions = {
+  selector: '',
+  ignoredTexts: [],
+};
 
 /**
  * Sets a copy button for all <p> tags within the specified element.
@@ -7,13 +14,30 @@ import copy from 'copy-to-clipboard';
  * 
  * @returns {boolean} True if the copy buttons were successfully set, false otherwise.
  */
-export function setCopyBtnForAllTagP(): boolean {
-  const allTagP = document.querySelectorAll('.entry-content p');
+export function setCopyBtnForAllTagP(
+  options: {
+    selector?: string;
+    ignoredTexts?: string[];
+  } = {
+    ...defaultCopyOptions,
+  }
+): boolean {
+  let { selector, ignoredTexts } = Object.assign(
+    {
+      ...defaultCopyOptions,
+    },
+    options
+  );
+  if (!selector) {
+    wpCon.warn('setCopyBtnForAllTagP: selector is empty, using default value');
+    selector = '.entry-content p';
+  }
+  const allTagP = document.querySelectorAll(selector);
   if (!allTagP || allTagP.length === 0) return false;
   allTagP.forEach(p => {
-    // pass if class = ez-toc-title
     if (p.classList.contains('ez-toc-title')) return;
     const text = p.innerText;
+    if (isNonEmptyArray(ignoredTexts) && ignoredTexts.includes(text)) return;
     const btn = document.createElement('button');
     btn.innerText = 'Copy';
     btn.classList.add('mazey-wp-btn-copy');
