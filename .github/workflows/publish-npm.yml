@@ -7,9 +7,10 @@ on:
   pull_request: # Test
     branches:
       - main
+      - 'release/v*'
   push: # Publish
     branches:
-      - main
+      - 'release/v*'
   workflow_dispatch:
 
 jobs:
