@@ -6,23 +6,24 @@ const wpCon = genCustomConsole('[Mazey WP Utils]');
 const defaultCopyOptions = {
   selector: '',
   ignoredTexts: [],
+  separate: '',
 };
 
 /**
  * Sets a copy button for all <p> tags within the specified element.
- * The copy button allows users to copy the text content of the <p> tag.
  * 
  * @returns {boolean} True if the copy buttons were successfully set, false otherwise.
  */
-export function setCopyBtnForAllTagP(
+export function setCopyBtn(
   options: {
     selector?: string;
     ignoredTexts?: string[];
+    separate?: string,
   } = {
     ...defaultCopyOptions,
   }
 ): boolean {
-  let { selector, ignoredTexts } = Object.assign(
+  let { selector, ignoredTexts, separate } = Object.assign(
     {
       ...defaultCopyOptions,
     },
@@ -35,8 +36,21 @@ export function setCopyBtnForAllTagP(
   const allTagP = document.querySelectorAll(selector);
   if (!allTagP || allTagP.length === 0) return false;
   allTagP.forEach(p => {
-    if (p.classList.contains('ez-toc-title')) return;
-    const text = p.innerText;
+    let text = '';
+    if (separate) {
+      const child = p.children;
+      if (!child || child.length === 0) return;
+      const len = child.length;
+      for (let index = 0; index < len; ++index) {
+        if (index === 0) {
+          text = child[index].innerText
+        } else {
+          text += separate + child[index].innerText
+        }
+      }
+    } else {
+      text = p.innerText;
+    }
     if (isNonEmptyArray(ignoredTexts) && ignoredTexts.includes(text)) return;
     const btn = document.createElement('button');
     btn.innerText = 'Copy';
@@ -51,6 +65,23 @@ export function setCopyBtnForAllTagP(
     p.appendChild(btn);
   });
   return true;
+}
+
+/**
+ * Alias of "setCopyBtn"
+ * The copy button allows users to copy the text content of the <p> tag.
+ * 
+ * @hidden
+ */
+export function setCopyBtnForAllTagP(
+  options: {
+    selector?: string;
+    ignoredTexts?: string[];
+  } = {
+    ...defaultCopyOptions,
+  }
+): boolean {
+  return setCopyBtn(options)
 }
 
 /**
