@@ -11,7 +11,7 @@
     "build": "npx rollup -c",
     "test": "jest",
     "release": "npm run build && npm publish",
-    "lint-and-fix": "eslint ./src/index.ts --ext 'ts,tsx' --fix",
+    "lint:fix": "eslint ./src/index.ts --ext 'ts,tsx' --fix",
     "check-health": "npm run build && npm run test"
   },
   "repository": {

@@ -1,12 +1,12 @@
-import { throttle, genCustomConsole, isNonEmptyArray } from 'mazey';
-import copy from 'copy-to-clipboard';
+import { throttle, genCustomConsole, isNonEmptyArray } from "mazey";
+import copy from "copy-to-clipboard";
 
-const wpCon = genCustomConsole('[Mazey WP Utils]');
+const wpCon = genCustomConsole("[Mazey WP Utils]");
 
 const defaultCopyOptions = {
-  selector: '',
+  selector: "",
   ignoredTexts: [],
-  separate: '',
+  separate: "",
 };
 
 /**
@@ -30,36 +30,36 @@ export function setCopyBtn(
     options
   );
   if (!selector) {
-    wpCon.warn('setCopyBtnForAllTagP: selector is empty, using default value');
-    selector = '.entry-content p';
+    wpCon.warn("setCopyBtnForAllTagP: selector is empty, using default value");
+    selector = ".entry-content p";
   }
   const allTagP = document.querySelectorAll(selector);
   if (!allTagP || allTagP.length === 0) return false;
   allTagP.forEach(p => {
-    let text = '';
+    let text = "";
     if (separate) {
       const child = p.children;
       if (!child || child.length === 0) return;
       const len = child.length;
       for (let index = 0; index < len; ++index) {
         if (index === 0) {
-          text = child[index].innerText
+          text = child[index].innerText;
         } else {
-          text += separate + child[index].innerText
+          text += separate + child[index].innerText;
         }
       }
     } else {
       text = p.innerText;
     }
     if (isNonEmptyArray(ignoredTexts) && ignoredTexts.includes(text)) return;
-    const btn = document.createElement('button');
-    btn.innerText = 'Copy';
-    btn.classList.add('mazey-wp-btn-copy');
-    btn.addEventListener('click', () => {
+    const btn = document.createElement("button");
+    btn.innerText = "Copy";
+    btn.classList.add("mazey-wp-btn-copy");
+    btn.addEventListener("click", () => {
       copy(text);
-      btn.innerText = 'Copied';
+      btn.innerText = "Copied";
       setTimeout(() => {
-        btn.innerText = 'Copy';
+        btn.innerText = "Copy";
       }, 1000);
     });
     p.appendChild(btn);
@@ -81,7 +81,7 @@ export function setCopyBtnForAllTagP(
     ...defaultCopyOptions,
   }
 ): boolean {
-  return setCopyBtn(options)
+  return setCopyBtn(options);
 }
 
 /**
@@ -95,12 +95,12 @@ export function setCopyBtnForAllTagP(
  * @param selector - CSS selector for the element that contains the images. Default is '.site-content'.
  * @returns {boolean} - Returns `true` if the function was able to set the images' lazy loading and it hasn't been run before, `false` otherwise.
  */
-export function setImgLazyLoadingWhenDomReady(selector = '.site-content'): boolean {
+export function setImgLazyLoadingWhenDomReady(selector = ".site-content"): boolean {
   function handleLoad () {
     const images = document.querySelectorAll(`${selector} img`);
     if (images.length === 0) return false;
     images.forEach(image => {
-      image.setAttribute('loading', 'lazy');
+      image.setAttribute("loading", "lazy");
     });
     return true;
   }
@@ -134,8 +134,8 @@ let loadedHideHeaderInTOC = false;
  */
 export function hideHeaderInTOC(options = {}): boolean {
   const { urlContainList = [], headerSelector } = Object.assign({
-    urlContainList: [ 'hide_header_in_toc' ],
-    headerSelector: '.site-header',
+    urlContainList: [ "hide_header_in_toc" ],
+    headerSelector: ".site-header",
   }, options);
   let isIncludeUrls = false;
   if (urlContainList.length === 0) {
@@ -143,7 +143,7 @@ export function hideHeaderInTOC(options = {}): boolean {
   } else {
     isIncludeUrls = urlContainList.some(urlContainString => isIncludeInUrl({ urlContainString }));
   }
-  const isEzTocContainerDomExist = document.querySelector('#ez-toc-container');
+  const isEzTocContainerDomExist = document.querySelector("#ez-toc-container");
   const isHideHeader = isIncludeUrls || isEzTocContainerDomExist;
   const SiteHeaderDom = document.querySelector(headerSelector);
   if (!SiteHeaderDom) return false;
@@ -153,14 +153,14 @@ export function hideHeaderInTOC(options = {}): boolean {
     const scrollTop = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop;
     const visibility = SiteHeaderDom.style.visibility;
     if (scrollTop > 100) {
-      if (visibility !== 'hidden') SiteHeaderDom.style.visibility = 'hidden';
+      if (visibility !== "hidden") SiteHeaderDom.style.visibility = "hidden";
     } else {
-      if (visibility !== 'visible') SiteHeaderDom.style.visibility = 'visible';
+      if (visibility !== "visible") SiteHeaderDom.style.visibility = "visible";
     }
   }
   if (isHideHeader && SiteHeaderDom && loadedHideHeaderInTOC === false) {
     // Listen
-    window.addEventListener('scroll', throttle(handleScroll, 50, { leading: true }));
+    window.addEventListener("scroll", throttle(handleScroll, 50, { leading: true }));
     // Init when page loaded
     setTimeout(() => {
       handleScroll();
@@ -192,9 +192,9 @@ export function hideHeaderInTOC(options = {}): boolean {
  */
 export function hideSidebar(options = {}): boolean {
   const { urlContainList = [], primarySelector, secondarySelector } = Object.assign({
-    urlContainList: [ 'hide_sidebar' ],
-    primarySelector: '#primary',
-    secondarySelector: '#secondary',
+    urlContainList: [ "hide_sidebar" ],
+    primarySelector: "#primary",
+    secondarySelector: "#secondary",
   }, options);
   const isHideSidebar = urlContainList.some(urlContainString => isIncludeInUrl({ urlContainString }));
   const secondaryDom = document.querySelector(secondarySelector);
@@ -202,8 +202,8 @@ export function hideSidebar(options = {}): boolean {
   const primaryDom = document.querySelector(primarySelector);
   if (!primaryDom) return false;
   if (isHideSidebar && secondaryDom && primaryDom) {
-    secondaryDom.style.display = 'none';
-    primaryDom.style.width = '100%';
+    secondaryDom.style.display = "none";
+    primaryDom.style.width = "100%";
     return true;
   }
   return false;
@@ -224,8 +224,8 @@ export function hideSidebar(options = {}): boolean {
  * @returns {boolean} - Returns `true` if the URL contains the specified string, `false` otherwise.
  */
 export function isIncludeInUrl(options = {}): boolean {
-  const { urlContainString = '' } = Object.assign({
-    urlContainString: '',
+  const { urlContainString = "" } = Object.assign({
+    urlContainString: "",
   }, options);
   const Url = location.href;
   return Url.includes(urlContainString);
@@ -249,10 +249,10 @@ export function isIncludeInUrl(options = {}): boolean {
 export function setImgWidthHeight(): boolean {
   const $ = window.jQuery || window.$;
   if ($) {
-    $('img').each(function () {
+    $("img").each(function () {
       const $this = $(this);
       if (!$this) return;
-      const src = $this.attr('src');
+      const src = $this.attr("src");
       if (!src) return;
       const width = src.match(/width=([0-9]+[a-z%]+)/);
       const height = src.match(/height=([0-9]+[a-z%]+)/);
