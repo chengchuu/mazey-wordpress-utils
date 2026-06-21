@@ -2,7 +2,7 @@
 // declare namespace navigator {
 //   let connection: string;
 // }
-declare module 'copy-to-clipboard';
+declare module "copy-to-clipboard";
 
 interface Window {
   $: any;

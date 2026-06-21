@@ -1,12 +1,13 @@
 {
   "name": "mazey-wordpress-utils",
-  "version": "1.4.0",
-  "description": "WordPress utilities.",
+  "version": "1.4.1",
+  "description": "WordPress Utilities",
   "main": "lib/index.cjs.js",
   "module": "lib/index.esm.js",
   "typings": "lib/index.d.ts",
   "mainEntryPointFilePath": "lib/index.d.ts",
   "scripts": {
+    "nvm:14": "bash ./scripts/use-node14-macm5.sh",
     "dev": "webpack-dev-server --open",
     "build": "npx rollup -c",
     "test": "jest",
