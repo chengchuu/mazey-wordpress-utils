@@ -12,7 +12,6 @@ doc/
 .sass-cache/
 undefined/
 temp/
-package-lock.json
 lib/
 pnpm-lock.yaml
 

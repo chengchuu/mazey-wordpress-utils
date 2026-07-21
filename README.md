@@ -82,14 +82,26 @@ For an image with the URL `<img src="https://example.com/image.png?width=400rem&
 
 | Dependency | Version                      |
 |------------|------------------------------|
-| Node.js    | v14.21.3                     |
+| Node.js    | v22                          |
 
 ### Scripts
 
 ```bash
-# dev
-npm run dev
+# install the project Node.js version
+nvm use
+
+# install dependencies
+npm ci
+
+# lint
+npm run lint
+
+# test
+npm test
 
 # build
 npm run build
+
+# dev
+npm run dev
 ```
