@@ -13,7 +13,9 @@ doc/
 undefined/
 temp/
 lib/
-pnpm-lock.yaml
+# pnpm-lock.yaml
+pnpm-workspace.yaml
+package-lock.json
 
 # Editor directories and files
 .idea

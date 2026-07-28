@@ -15,7 +15,7 @@ WordPress utilities.
 You can get mazey-wordpress-utils via [npm](https://www.npmjs.com/package/mazey-wordpress-utils).
 
 ```bash
-npm install mazey-wordpress-utils --save
+npm install mazey-wordpress-utils
 ```
 
 ## Usage
