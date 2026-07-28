@@ -1,9 +1,18 @@
-import babel from "rollup-plugin-babel";
+import { rmSync } from "node:fs";
+import { babel } from "@rollup/plugin-babel";
+import commonjs from "@rollup/plugin-commonjs";
+import terser from "@rollup/plugin-terser";
 import rollupTypescript from "rollup-plugin-typescript2";
 import { DEFAULT_EXTENSIONS } from "@babel/core";
-import commonjs from "rollup-plugin-commonjs";
-import { terser } from "rollup-plugin-terser";
-import cleaner from "rollup-plugin-cleaner";
+
+function cleanLib() {
+  return {
+    name: "clean-lib",
+    buildStart() {
+      rmSync("lib", { recursive: true, force: true });
+    },
+  };
+}
 
 export default [
   {
@@ -19,12 +28,13 @@ export default [
       },
     ],
     plugins: [
+      cleanLib(),
       rollupTypescript(),
       commonjs({
         include: /node_modules/,
       }),
       babel({
-        runtimeHelpers: true,
+        babelHelpers: "runtime",
         // 只转换源代码，不运行外部依赖
         exclude: "node_modules/**",
         // babel 默认不支持 ts 需要手动添加
@@ -33,13 +43,8 @@ export default [
           ".ts",
         ],
       }),
-      cleaner({
-        targets: [
-          "lib/",
-        ],
-      }),
     ],
-    external: [ "mazey", "copy-to-clipboard" ],
+    external: [ "mazey", "copy-to-clipboard", /^@babel\/runtime/, /^core-js\// ],
   },
   {
     input: "src/polyfill.js",
