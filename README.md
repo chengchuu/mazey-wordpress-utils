@@ -91,7 +91,7 @@ For an image with the URL `<img src="https://example.com/image.png?width=400rem&
 nvm use
 
 # install dependencies
-npm ci
+npm install
 
 # lint
 npm run lint
