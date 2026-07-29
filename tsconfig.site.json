@@ -5,6 +5,7 @@
     "module": "ESNext",
     "declaration": false,
     "declarationMap": false,
+    "rootDir": ".",
     "outDir": "dist-dev"
   },
   "include": [

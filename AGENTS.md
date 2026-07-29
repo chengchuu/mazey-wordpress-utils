@@ -35,7 +35,7 @@ These APIs require browser globals when invoked. Keep imports free of new module
 - `rollup.config.mjs` owns production packaging. It clears `lib/`, compiles TypeScript declarations, applies Babel, and emits CJS and ESM builds while keeping runtime dependencies external. A second Rollup entry minifies `src/polyfill.js` to `lib/polyfill.min.js`.
 - `scripts/webpack.config.js` owns only the website/playground and generated `dist-dev/` files.
 - TypeDoc generates `.pages-api/`; `scripts/build-pages.js` combines it with Webpack output and emits the final `docs/` Pages artifact.
-- `tsconfig.json` defines strict TypeScript checking, declarations, DOM libraries, ES2015 modules, and the ES5 target.
+- `tsconfig.json` defines strict isolated TypeScript checking, declarations, modern bundler resolution, DOM libraries, ESNext modules, and the ES2015 intermediate target. Babel owns final browser downleveling.
 - `.babelrc` defines browser transpilation and usage-based `core-js` transforms.
 - `.eslintrc`, `.eslintignore`, `.editorconfig`, and `.lintstagedrc` define source style and staged-file linting.
 - `commitlint.config.js` and `.husky/` enforce Conventional Commit messages and pre-commit linting.
