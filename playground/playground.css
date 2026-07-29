@@ -1,0 +1,22 @@
+.playground-output {
+  min-height: 5rem;
+  padding: 1rem;
+  border-left: 4px solid var(--mw-primary);
+  border-radius: 0.25rem;
+  color: var(--mw-text);
+  background: var(--mw-primary-soft);
+}
+
+.demo-image {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin-top: 1rem;
+}
+
+.demo-sidebar {
+  padding: 1rem;
+  border: 1px solid var(--mw-border);
+  border-radius: 0.5rem;
+  background: var(--mw-surface-muted);
+}

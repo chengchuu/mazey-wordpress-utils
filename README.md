@@ -8,7 +8,11 @@
 [l-image]: https://img.shields.io/npm/l/mazey-wordpress-utils
 [l-url]: https://github.com/chengchuu/mazey-wordpress-utils
 
-WordPress utilities.
+Browser-focused TypeScript utilities for modifying WordPress page markup.
+
+- [Project website](https://chengchuu.github.io/mazey-wordpress-utils/)
+- [Playground](https://chengchuu.github.io/mazey-wordpress-utils/playground/)
+- [API documentation](https://chengchuu.github.io/mazey-wordpress-utils/api/)
 
 ## Install
 
@@ -62,6 +66,14 @@ isIncludeInUrl({
 });
 ```
 
+### setImgLazyLoadingWhenDomReady
+
+Set `loading="lazy"` on images inside a matching container.
+
+```javascript
+setImgLazyLoadingWhenDomReady('.site-content');
+```
+
 ### setImgWidthHeight
 
 Set the width and height of an image based on the parameters specified in the image's URL.
@@ -102,6 +114,12 @@ npm test
 # build
 npm run build
 
-# dev
+# build and validate the GitHub Pages artifact
+npm run docs
+
+# run the website and playground development server
 npm run dev
+
+# run the full package and website verification pipeline
+npm run preview
 ```
