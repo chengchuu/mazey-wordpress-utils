@@ -129,9 +129,7 @@ let loadedHideHeaderInTOC = false;
  * });
  * ```
  * 
- * @param options - Configuration options for hiding the header.
- * @param options.urlContainList - List of strings. If the current URL contains any of these strings, the header will be hidden. Default is ['hide_header_in_toc'].
- * @param options.headerSelector - CSS selector for the header. Default is '.site-header'.
+ * @param options - Configuration options with a URL substring list and header selector.
  * @returns {boolean} - Returns `true` if the header was successfully hidden, `false` otherwise.
  */
 export function hideHeaderInTOC(options = {}): boolean {
@@ -186,10 +184,7 @@ export function hideHeaderInTOC(options = {}): boolean {
  * });
  * ```
  * 
- * @param options - Configuration options for hiding the sidebar.
- * @param options.urlContainList - List of strings. If the current URL contains any of these strings, the sidebar will be hidden. Default is ['hide_sidebar'].
- * @param options.primarySelector - CSS selector for the primary content area. Default is '#primary'.
- * @param options.secondarySelector - CSS selector for the sidebar. Default is '#secondary'.
+ * @param options - Configuration options with a URL substring list and primary and secondary selectors.
  * @returns {boolean} - Returns `true` if the sidebar was successfully hidden, `false` otherwise.
  */
 export function hideSidebar(options = {}): boolean {
@@ -222,7 +217,7 @@ export function hideSidebar(options = {}): boolean {
  * });
  * ```
  * 
- * @param options.urlContainString - The string to check for in the URL. Default is an empty string.
+ * @param options - Configuration with the URL substring to check.
  * @returns {boolean} - Returns `true` if the URL contains the specified string, `false` otherwise.
  */
 export function isIncludeInUrl(options = {}): boolean {
