@@ -16,8 +16,6 @@ Browser-focused TypeScript utilities for modifying WordPress page markup.
 
 ## Install
 
-You can get mazey-wordpress-utils via [npm](https://www.npmjs.com/package/mazey-wordpress-utils).
-
 ```bash
 npm install mazey-wordpress-utils
 ```

@@ -1,6 +1,6 @@
 {
   "name": "mazey-wordpress-utils",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Browser-focused TypeScript utilities for modifying WordPress page markup.",
   "main": "lib/index.cjs.js",
   "module": "lib/index.esm.js",
