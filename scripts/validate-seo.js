@@ -29,6 +29,91 @@ function walkFiles(directory, relative = "") {
     .sort();
 }
 
+function validateThemeToggle(relativePath, html) {
+  const buttons = [
+    ...html.matchAll(
+      /<button\b[^>]*data-theme-toggle[^>]*>[\s\S]*?<\/button>/gi
+    ),
+  ];
+  if (buttons.length !== 1) {
+    failures.push(`${relativePath}: expected exactly one navbar theme button`);
+    return;
+  }
+
+  const button = buttons[0][0];
+  const openingTag = button.match(/<button\b[^>]*>/i)?.[0] || "";
+  if (!/\btype=["']button["']/i.test(openingTag)) {
+    failures.push(`${relativePath}: theme button must use type=button`);
+  }
+  if (!/\bclass=["'][^"']*\btheme-toggle\b[^"']*["']/i.test(openingTag)) {
+    failures.push(`${relativePath}: theme button is missing theme-toggle`);
+  }
+  if (
+    !openingTag.includes(
+      'aria-label="Current theme: Light. Switch to dark theme."'
+    )
+  ) {
+    failures.push(`${relativePath}: theme button label is invalid`);
+  }
+  if (/\baria-pressed\b/i.test(openingTag)) {
+    failures.push(`${relativePath}: theme button must not use aria-pressed`);
+  }
+
+  for (const theme of ["light", "dark"]) {
+    const icons = [
+      ...button.matchAll(
+        new RegExp(
+          `<svg\\b(?=[^>]*data-theme-icon=["']${theme}["'])[^>]*>`,
+          "gi"
+        )
+      ),
+    ];
+    if (icons.length !== 1) {
+      failures.push(`${relativePath}: expected one ${theme} theme icon`);
+      continue;
+    }
+    const icon = icons[0][0];
+    if (!/\bwidth=["']16["']/i.test(icon) || !/\bheight=["']16["']/i.test(icon)) {
+      failures.push(`${relativePath}: ${theme} theme icon must be 16 by 16`);
+    }
+    if (!/\baria-hidden=["']true["']/i.test(icon) || !/\bfocusable=["']false["']/i.test(icon)) {
+      failures.push(`${relativePath}: ${theme} theme icon must be decorative`);
+    }
+    const hidden = /\shidden(?:\s|=|>)/i.test(icon);
+    if ((theme === "light" && hidden) || (theme === "dark" && !hidden)) {
+      failures.push(`${relativePath}: ${theme} theme icon visibility is invalid`);
+    }
+  }
+
+  if (/data-theme-select/i.test(html)) {
+    failures.push(`${relativePath}: obsolete navbar theme selector is present`);
+  }
+}
+
+function validateTypeDocThemeSelector(relativePath, html) {
+  const selectors = [
+    ...html.matchAll(
+      /<select\b(?=[^>]*\bid=["']tsd-theme["'])[^>]*>([\s\S]*?)<\/select>/gi
+    ),
+  ];
+  if (selectors.length !== 1) {
+    failures.push(`${relativePath}: expected one native TypeDoc theme selector`);
+    return;
+  }
+  const options = [...selectors[0][1].matchAll(
+    /<option\b[^>]*value=["']([^"']+)["'][^>]*>([\s\S]*?)<\/option>/gi
+  )].map(match => [match[1], match[2].replace(/<[^>]*>/g, "").trim()]);
+  if (
+    JSON.stringify(options) !==
+    JSON.stringify([
+      ["light", "Light"],
+      ["dark", "Dark"],
+    ])
+  ) {
+    failures.push(`${relativePath}: TypeDoc themes must be Light and Dark`);
+  }
+}
+
 function validatePage(relativePath, page) {
   const html = read(relativePath);
   const checks = [
@@ -53,6 +138,11 @@ function validatePage(relativePath, page) {
 validatePage("index.html", projectConfig.site.pages.home);
 validatePage("playground/index.html", projectConfig.site.pages.playground);
 validatePage("api/index.html", projectConfig.site.pages.api);
+validateThemeToggle("index.html", read("index.html"));
+validateThemeToggle(
+  "playground/index.html",
+  read("playground/index.html")
+);
 
 const apiHtmlFiles = walkFiles(path.join(docsDir, "api"))
   .filter(file => file.endsWith(".html"))
@@ -72,6 +162,8 @@ for (const relativePath of apiHtmlFiles) {
   if (count(html, /<h1\b/gi) !== 1) {
     failures.push(`${relativePath}: expected exactly one h1`);
   }
+  validateThemeToggle(relativePath, html);
+  validateTypeDocThemeSelector(relativePath, html);
 }
 if (new Set(canonicalUrls).size !== canonicalUrls.length) {
   failures.push("API documentation contains duplicate canonical URLs");
