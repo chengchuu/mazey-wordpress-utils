@@ -123,16 +123,36 @@ a {
   border-color: var(--mw-border);
 }
 
-.theme-control {
-  display: flex;
+.theme-toggle {
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  flex: none;
+  box-sizing: border-box;
+  width: 32px;
+  height: 32px;
+  padding: 7px;
   color: var(--mw-muted);
-  font-size: 0.875rem;
-  font-weight: 600;
+  background: transparent;
+  border: 1px solid var(--mw-border);
+  border-radius: 50%;
+  cursor: pointer;
 }
 
-.theme-control .form-select,
+.theme-toggle:hover {
+  color: var(--mw-text);
+  background: var(--mw-surface-muted);
+}
+
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.theme-toggle [hidden] {
+  display: none;
+}
+
 .form-control {
   color: var(--mw-text);
   border-color: var(--mw-border);
@@ -343,10 +363,8 @@ a {
     align-items: stretch;
   }
 
-  .theme-control {
+  .theme-toggle {
     margin-top: 0.5rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--mw-border);
   }
 }
 

@@ -26,39 +26,79 @@ body {
 .site-project-links {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  width: 100%;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 0.75rem;
+  margin-right: 1rem;
   min-height: 3rem;
+  overflow-x: auto;
+  white-space: nowrap;
 }
 
 .site-project-links a {
+  flex: none;
   color: var(--mw-api-primary);
   font-weight: 600;
 }
 
-.site-project-links .theme-control {
-  display: flex;
+.site-project-links .theme-toggle {
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  justify-content: center;
+  flex: none;
+  box-sizing: border-box;
+  width: 28px;
+  height: 28px;
+  padding: 0.25rem;
   margin-left: auto;
+  color: inherit;
+  border: 1px solid var(--mw-api-primary);
+  border-radius: 50%;
+  background: var(--mw-api-surface);
+  cursor: pointer;
 }
 
-.site-project-links select {
+.tsd-theme-toggle select {
   min-height: 2rem;
   color: var(--mw-api-text);
   border: 1px solid var(--mw-api-border);
   background: var(--mw-api-surface);
 }
 
+.site-project-links .theme-toggle:focus-visible {
+  outline: 2px solid var(--mw-api-primary);
+  outline-offset: 2px;
+}
+
+.site-project-links .theme-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+.site-project-links .theme-toggle [hidden] {
+  display: none;
+}
+
 @media (max-width: 720px) {
-  .site-project-links {
-    align-items: flex-start;
+  .tsd-toolbar-contents {
     flex-wrap: wrap;
-    padding-block: 0.5rem;
+    height: auto;
+    min-height: var(--dim-toolbar-contents-height);
+    padding-block: 0.25rem;
   }
 
-  .site-project-links .theme-control {
-    width: 100%;
-    margin-left: 0;
+  .tsd-toolbar-contents > .title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .site-project-links {
+    order: 2;
+    flex: 0 0 100%;
+    margin-right: 0;
+    min-height: 2.5rem;
+    padding-block: 0.25rem;
   }
 }

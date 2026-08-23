@@ -1,6 +1,6 @@
 {
   "name": "mazey-wordpress-utils",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Browser-focused TypeScript utilities for modifying WordPress page markup.",
   "main": "lib/index.cjs.js",
   "module": "lib/index.esm.js",
@@ -17,10 +17,6 @@
       "/dist/",
       "/lib/"
     ]
-  },
-  "engines": {
-    "node": "22.x",
-    "npm": ">=10"
   },
   "scripts": {
     "dev": "webpack serve --config ./scripts/webpack.config.js",
@@ -73,6 +69,7 @@
     "@typescript-eslint/eslint-plugin": "8.65.0",
     "@typescript-eslint/parser": "8.65.0",
     "bootstrap": "5.3.8",
+    "bootstrap-icons": "^1.13.1",
     "cross-env": "10.1.0",
     "css-loader": "7.1.4",
     "eslint": "8.57.1",
@@ -96,6 +93,6 @@
     "@babel/runtime": "7.29.7",
     "copy-to-clipboard": "3.3.3",
     "core-js": "^3.49.0",
-    "mazey": "^5.6.1"
+    "mazey": "^5.7.4"
   }
 }
