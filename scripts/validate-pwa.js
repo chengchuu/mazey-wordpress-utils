@@ -1,12 +1,22 @@
 "use strict";
 
-const { existsSync, readFileSync } = require("node:fs");
+const { existsSync, readFileSync, readdirSync, statSync } = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
 const projectConfig = require("../project.config");
 
 const docsDir = path.resolve(__dirname, "..", "docs");
 const failures = [];
+function htmlFiles(directory) {
+  return readdirSync(directory).flatMap(name => {
+    const file = path.join(directory, name);
+    return statSync(file).isDirectory()
+      ? htmlFiles(file)
+      : file.endsWith(".html")
+        ? [file]
+        : [];
+  });
+}
 
 function read(relativePath) {
   const file = path.join(docsDir, relativePath);
@@ -74,6 +84,18 @@ for (const page of [
     failures.push(`${page}: theme-color metadata is missing`);
   }
 }
+for (const file of htmlFiles(docsDir)) {
+  const html = readFileSync(file, "utf8");
+  for (const forbidden of [
+    "data-pwa-update",
+    "data-pwa-update-now",
+    "pwa-update-notice",
+    "site-pwa-update",
+  ]) {
+    if (html.includes(forbidden))
+      failures.push(`${path.relative(docsDir, file)} contains removed update UI: ${forbidden}`);
+  }
+}
 
 const worker = read("service-worker.js").toString("utf8");
 try {
@@ -87,8 +109,8 @@ if (worker.includes("__BASE_PATH__") || worker.includes("__CACHE_NAME__")) {
 if (!worker.includes(`const BASE_PATH = "${projectConfig.site.basePath}"`)) {
   failures.push("service-worker.js scope guard does not match the Pages base");
 }
-if (!worker.includes('event.data.type === "SKIP_WAITING"')) {
-  failures.push("service-worker.js lacks explicit update activation handling");
+if (/SKIP_WAITING|skipWaiting\s*\(/.test(worker)) {
+  failures.push("service-worker.js contains forced update activation");
 }
 if (!worker.includes("networkFirst(request, BASE_PATH)")) {
   failures.push("service-worker.js navigation fallback is not the precached root");
