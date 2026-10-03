@@ -1,6 +1,4 @@
-import {
-  setCopyBtnForAllTagP
- } from './index';
+import { setCopyBtnForAllTagP } from "./index";
 
 const res = setCopyBtnForAllTagP();
 

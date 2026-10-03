@@ -23,12 +23,14 @@ export function setCopyBtn(
     ...defaultCopyOptions,
   }
 ): boolean {
-  let { selector, ignoredTexts, separate } = Object.assign(
+  const normalizedOptions = Object.assign(
     {
       ...defaultCopyOptions,
     },
     options
   );
+  let { selector } = normalizedOptions;
+  const { ignoredTexts, separate } = normalizedOptions;
   if (!selector) {
     wpCon.warn("setCopyBtnForAllTagP: selector is empty, using default value");
     selector = ".entry-content p";
