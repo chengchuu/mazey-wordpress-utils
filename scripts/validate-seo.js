@@ -3,6 +3,7 @@
 const { existsSync, readFileSync, readdirSync } = require("node:fs");
 const path = require("node:path");
 const projectConfig = require("../project.config");
+const { imageDimensions } = require("./image-dimensions");
 
 const docsDir = path.resolve(__dirname, "..", "docs");
 const failures = [];
@@ -18,6 +19,55 @@ function read(relativePath) {
 
 function count(html, pattern) {
   return [...html.matchAll(pattern)].length;
+}
+
+function validateBrandMetadata(relativePath, html) {
+  const { assets } = projectConfig;
+  const social = projectConfig.seo.openGraphImage;
+  const links = [
+    ["icon", assets.faviconUrl, assets.faviconType, "32x32"],
+    ["apple-touch-icon", assets.appleTouchIconUrl, null, "180x180"],
+  ];
+  for (const [rel, href, type, sizes] of links) {
+    const tags = [...html.matchAll(new RegExp(`<link\\b(?=[^>]*\\brel=["']${rel}["'])[^>]*>`, "gi"))];
+    if (tags.length !== 1 || !tags[0][0].includes(`href="${href}"`) ||
+        !tags[0][0].includes(`sizes="${sizes}"`) ||
+        (type && !tags[0][0].includes(`type="${type}"`))) {
+      failures.push(`${relativePath}: invalid ${rel} metadata`);
+    }
+  }
+  for (const [attribute, name, value] of [
+    ["property", "og:image", social.url],
+    ["property", "og:image:type", social.type],
+    ["property", "og:image:width", social.width],
+    ["property", "og:image:height", social.height],
+    ["property", "og:image:alt", social.alt],
+    ["name", "twitter:card", "summary_large_image"],
+    ["name", "twitter:image", social.url],
+    ["name", "twitter:image:alt", social.alt],
+  ]) {
+    const tags = [...html.matchAll(new RegExp(`<meta\\b(?=[^>]*${attribute}="${name}")[^>]*>`, "g"))];
+    if (tags.length !== 1 || !tags[0][0].includes(`content="${value}"`)) {
+      failures.push(`${relativePath}: invalid ${name} metadata`);
+    }
+  }
+}
+
+for (const [file, type, expected] of [
+  [projectConfig.assets.faviconFile, "image/png", [32, 32]],
+  [projectConfig.assets.logoFile, "image/png", [192, 192]],
+  [projectConfig.assets.appleTouchIconFile, "image/png", [180, 180]],
+  [projectConfig.seo.openGraphImage.file, projectConfig.seo.openGraphImage.type,
+    [projectConfig.seo.openGraphImage.width, projectConfig.seo.openGraphImage.height]],
+]) {
+  try {
+    const dimensions = imageDimensions(readFileSync(path.join(docsDir, "images", file)), type);
+    if (JSON.stringify(dimensions) !== JSON.stringify(expected)) {
+      failures.push(`${file}: incorrect image dimensions`);
+    }
+  } catch (error) {
+    failures.push(`${file}: ${error.message}`);
+  }
 }
 
 function walkFiles(directory, relative = "") {
@@ -202,6 +252,7 @@ for (const relativePath of [
 ]) {
   const html = read(relativePath);
   const pageRoute = relativePath.replace(/index\.html$/, "");
+  validateBrandMetadata(relativePath, html);
   const pageUrl = new URL(pageRoute, projectConfig.site.url);
   const references = [...html.matchAll(/(?:href|src)="([^"]+)"/g)].map(
     match => match[1]
