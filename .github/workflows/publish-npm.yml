@@ -1,14 +1,16 @@
 name: Publish npm Packages
 
 env:
-  NODE_VERSION: '14'
+  NODE_VERSION: '22'
 
 on:
-  pull_request: # Test
+  # Test
+  pull_request:
     branches:
       - main
       - 'release/v*'
-  push: # Publish
+  # Publish
+  push:
     branches:
       - 'release/v*'
   workflow_dispatch:
@@ -18,10 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -37,10 +39,10 @@ jobs:
     if: github.event_name == 'push'
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ env.NODE_VERSION }}
           registry-url: 'https://registry.npmjs.org/'
