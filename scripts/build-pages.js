@@ -12,7 +12,6 @@ const {
 } = require("node:fs");
 const { createHash } = require("node:crypto");
 const path = require("node:path");
-const zlib = require("node:zlib");
 const projectConfig = require("../project.config");
 
 const root = path.resolve(__dirname, "..");
@@ -142,7 +141,8 @@ function transformApiHtml(html, relativeFile) {
     seoStart,
     `<meta name="description" content="${escapeAttribute(description)}">`,
     `<link rel="canonical" href="${url}">`,
-    `<link rel="icon" href="${projectConfig.assets.faviconUrl}" type="image/svg+xml">`,
+    `<link rel="icon" href="${projectConfig.assets.faviconUrl}" type="${projectConfig.assets.faviconType}" sizes="32x32">`,
+    `<link rel="apple-touch-icon" href="${projectConfig.assets.appleTouchIconUrl}" sizes="180x180">`,
     `<link rel="manifest" href="${projectConfig.pwa.manifestUrl}">`,
     `<meta name="theme-color" content="${theme.colorPrimary}" data-theme-color data-theme-color-light="${theme.colorLight}" data-theme-color-dark="${theme.colorDark}">`,
     `<style>:root{--project-theme-primary:${theme.colorPrimary};--project-theme-primary-dark:${theme.primary.dark.base}}</style>`,
@@ -180,7 +180,7 @@ function transformApiHtml(html, relativeFile) {
     .replace(/<title>[^<]*<\/title>/i, `<title>${escapeAttribute(title)}</title>`)
     .replace(/<meta name="description"[^>]*>/i, "")
     .replace(/<link rel="canonical"[^>]*>/i, "")
-    .replace(/<link rel="icon"[^>]*>/i, "")
+    .replace(/<link\b(?=[^>]*\brel=["'](?:icon|shortcut icon|apple-touch-icon)["'])[^>]*>/gi, "")
     .replace(
       /<script\b[^>]*>(?:(?!<\/script>)[\s\S])*?document\.body\.style\.display(?:(?!<\/script>)[\s\S])*?<\/script>/i,
       ""
@@ -203,117 +203,11 @@ function transformApiHtml(html, relativeFile) {
   return ensureOneH1(output, title);
 }
 
-function crc32(buffer) {
-  let crc = 0xffffffff;
-  for (const byte of buffer) {
-    crc ^= byte;
-    for (let bit = 0; bit < 8; bit += 1) {
-      crc = (crc >>> 1) ^ (0xedb88320 & -(crc & 1));
-    }
+function copyImages(sourceDir, destinationDir) {
+  mkdirSync(destinationDir, { recursive: true });
+  for (const file of projectConfig.assetFiles) {
+    cpSync(path.join(sourceDir, file), path.join(destinationDir, file));
   }
-  return (crc ^ 0xffffffff) >>> 0;
-}
-
-function pngChunk(type, data) {
-  const typeBuffer = Buffer.from(type);
-  const output = Buffer.alloc(data.length + 12);
-  output.writeUInt32BE(data.length, 0);
-  typeBuffer.copy(output, 4);
-  data.copy(output, 8);
-  output.writeUInt32BE(crc32(Buffer.concat([typeBuffer, data])), data.length + 8);
-  return output;
-}
-
-function generatePng(width, height, painter) {
-  const raw = Buffer.alloc((width * 4 + 1) * height);
-  for (let y = 0; y < height; y += 1) {
-    raw[y * (width * 4 + 1)] = 0;
-    for (let x = 0; x < width; x += 1) {
-      const [red, green, blue, alpha = 255] = painter(x, y, width, height);
-      const offset = y * (width * 4 + 1) + 1 + x * 4;
-      raw[offset] = red;
-      raw[offset + 1] = green;
-      raw[offset + 2] = blue;
-      raw[offset + 3] = alpha;
-    }
-  }
-  const header = Buffer.alloc(13);
-  header.writeUInt32BE(width, 0);
-  header.writeUInt32BE(height, 4);
-  header[8] = 8;
-  header[9] = 6;
-  return Buffer.concat([
-    Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
-    pngChunk("IHDR", header),
-    pngChunk("IDAT", zlib.deflateSync(raw, { level: 9 })),
-    pngChunk("IEND", Buffer.alloc(0)),
-  ]);
-}
-
-function logoPixel(x, y, width, height, maskable) {
-  const scale = Math.min(width, height);
-  const margin = maskable ? 0.1 * scale : 0;
-  const inside =
-    x >= margin && y >= margin && x < width - margin && y < height - margin;
-  if (!inside) return [247, 249, 252, 255];
-  const nx = x / width;
-  const ny = y / height;
-  const orange = (nx - 0.81) ** 2 + (ny - 0.2) ** 2 < 0.006;
-  if (orange) return [255, 180, 84, 255];
-  const leftBar = nx > 0.2 && nx < 0.31 && ny > 0.28 && ny < 0.75;
-  const rightBar = nx > 0.69 && nx < 0.8 && ny > 0.28 && ny < 0.75;
-  const diagonalA = Math.abs(ny - (0.27 + (nx - 0.31) * 1.45)) < 0.065;
-  const diagonalB = Math.abs(ny - (0.75 - (nx - 0.5) * 1.45)) < 0.065;
-  if (leftBar || rightBar || diagonalA || diagonalB) return [255, 255, 255, 255];
-  return [56, 88, 179, 255];
-}
-
-function writeGeneratedImages() {
-  const imagesDir = path.join(docsDir, "images");
-  mkdirSync(imagesDir, { recursive: true });
-  writeFileSync(
-    path.join(imagesDir, "icon-192.png"),
-    generatePng(192, 192, (x, y, width, height) =>
-      logoPixel(x, y, width, height, false)
-    )
-  );
-  writeFileSync(
-    path.join(imagesDir, "icon-512.png"),
-    generatePng(512, 512, (x, y, width, height) =>
-      logoPixel(x, y, width, height, false)
-    )
-  );
-  writeFileSync(
-    path.join(imagesDir, "icon-maskable-512.png"),
-    generatePng(512, 512, (x, y, width, height) =>
-      logoPixel(x, y, width, height, true)
-    )
-  );
-  writeFileSync(
-    path.join(imagesDir, projectConfig.seo.openGraphImage.file),
-    generatePng(1200, 630, (x, y, width, height) => {
-      const normalizedX = x / width;
-      const normalizedY = y / height;
-      if (
-        (normalizedX - 0.78) ** 2 + (normalizedY - 0.25) ** 2 <
-        0.018
-      ) {
-        return [255, 180, 84, 255];
-      }
-      if (normalizedX > 0.08 && normalizedX < 0.42) {
-        return logoPixel(
-          x - 0.08 * width,
-          y - 0.18 * height,
-          0.5 * width,
-          0.64 * height,
-          false
-        );
-      }
-      return normalizedY > 0.72
-        ? [27, 40, 73, 255]
-        : [56, 88, 179, 255];
-    })
-  );
 }
 
 function contentFingerprint() {
@@ -336,7 +230,7 @@ function buildPages() {
   rmSync(docsDir, { recursive: true, force: true });
   cpSync(distDir, docsDir, { recursive: true });
   cpSync(typedocDir, path.join(docsDir, "api"), { recursive: true });
-  writeGeneratedImages();
+  copyImages(path.join(root, "images"), path.join(docsDir, "images"));
 
   const apiDir = path.join(docsDir, "api");
   walkFiles(apiDir)
@@ -374,7 +268,7 @@ function buildPages() {
     `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${routes.map(url => `  <url><loc>${url}</loc></url>`).join("\n")}\n</urlset>\n`
   );
 
-  const staticExtensions = new Set([ ".css", ".js", ".png", ".svg" ]);
+  const staticExtensions = new Set([ ".css", ".js", ".png", ".jpg", ".jpeg", ".svg" ]);
   const staticAssets = walkFiles(docsDir)
     .filter(file => staticExtensions.has(path.extname(file)))
     .map(file => `${projectConfig.site.basePath}${file.split(path.sep).join("/")}`);
@@ -406,4 +300,5 @@ if (require.main === module) buildPages();
 module.exports = {
   buildPages,
   transformApiHtml,
+  copyImages,
 };

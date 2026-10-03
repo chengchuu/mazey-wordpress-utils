@@ -3,6 +3,7 @@
 const { existsSync, readFileSync, readdirSync, statSync } = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { isDeepStrictEqual } = require("node:util");
 const projectConfig = require("../project.config");
 
 const docsDir = path.resolve(__dirname, "..", "docs");
@@ -50,6 +51,9 @@ if (manifest) {
     ["512x512:any", [512, 512]],
     ["512x512:maskable", [512, 512]],
   ]);
+  if (!isDeepStrictEqual(manifest.icons, projectConfig.pwa.icons.map(({ file, ...icon }) => icon))) {
+    failures.push("manifest icons do not match configured files, sizes, types, and purposes");
+  }
   for (const icon of manifest.icons || []) {
     const key = `${icon.sizes}:${icon.purpose}`;
     const dimensions = requiredIcons.get(key);
@@ -130,7 +134,7 @@ for (const page of [
   const html = read(page).toString("utf8");
   const pageUrl = new URL(page.replace(/index\.html$/, ""), projectConfig.site.url);
   const assetReferences = [
-    ...html.matchAll(/(?:href|src)="([^"]+\.(?:css|js|png|svg|webmanifest))"/g),
+    ...html.matchAll(/(?:href|src)="([^"]+\.(?:css|js|png|jpe?g|svg|webmanifest))"/g),
   ].map(match => new URL(match[1], pageUrl));
   for (const asset of assetReferences) {
     if (
@@ -140,6 +144,16 @@ for (const page of [
     ) {
       failures.push(`${page}: app-shell asset is not precached: ${asset.pathname}`);
     }
+  }
+}
+
+for (const file of projectConfig.assetFiles) {
+  const delivered = read(`images/${file}`);
+  if (!delivered.equals(readFileSync(path.resolve(__dirname, "..", "images", file)))) {
+    failures.push(`${file}: supplied image bytes were changed`);
+  }
+  if (!appShell.includes(`${projectConfig.site.basePath}images/${file}`)) {
+    failures.push(`${file}: supplied image is not precached`);
   }
 }
 
