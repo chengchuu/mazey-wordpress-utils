@@ -4,15 +4,17 @@
 [![l][l-image]][l-url]
 
 [npm-image]: https://img.shields.io/npm/v/mazey-wordpress-utils
-[npm-url]: https://npmjs.org/package/mazey-wordpress-utils
+[npm-url]: https://www.npmjs.com/package/mazey-wordpress-utils
 [l-image]: https://img.shields.io/npm/l/mazey-wordpress-utils
 [l-url]: https://github.com/chengchuu/mazey-wordpress-utils
 
-WordPress utilities.
+Browser-focused TypeScript utilities for modifying WordPress page markup.
+
+- [Project website](https://chengchuu.github.io/mazey-wordpress-utils/)
+- [Playground](https://chengchuu.github.io/mazey-wordpress-utils/playground/)
+- [API documentation](https://chengchuu.github.io/mazey-wordpress-utils/api/)
 
 ## Install
-
-You can get mazey-wordpress-utils via [npm](https://www.npmjs.com/package/mazey-wordpress-utils).
 
 ```bash
 npm install mazey-wordpress-utils
@@ -62,6 +64,14 @@ isIncludeInUrl({
 });
 ```
 
+### setImgLazyLoadingWhenDomReady
+
+Set `loading="lazy"` on images inside a matching container.
+
+```javascript
+setImgLazyLoadingWhenDomReady('.site-content');
+```
+
 ### setImgWidthHeight
 
 Set the width and height of an image based on the parameters specified in the image's URL.
@@ -87,9 +97,6 @@ For an image with the URL `<img src="https://example.com/image.png?width=400rem&
 ### Scripts
 
 ```bash
-# install the project Node.js version
-nvm use
-
 # install dependencies
 npm install
 
@@ -102,6 +109,12 @@ npm test
 # build
 npm run build
 
-# dev
+# build and validate the GitHub Pages artifact
+npm run docs
+
+# run the website and playground development server
 npm run dev
+
+# run the full package and website verification pipeline
+npm run preview
 ```
