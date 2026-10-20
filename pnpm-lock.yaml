@@ -18,8 +18,8 @@ importers:
         specifier: ^3.49.0
         version: 3.49.0
       mazey:
-        specifier: ^5.6.1
-        version: 5.6.1
+        specifier: ^5.7.4
+        version: 5.7.4
     devDependencies:
       '@babel/core':
         specifier: 7.29.7
@@ -57,6 +57,9 @@ importers:
       bootstrap:
         specifier: 5.3.8
         version: 5.3.8(@popperjs/core@2.11.8)
+      bootstrap-icons:
+        specifier: ^1.13.1
+        version: 1.13.1
       cross-env:
         specifier: 10.1.0
         version: 10.1.0
@@ -1740,6 +1743,9 @@ packages:
   boolbase@1.0.0:
     resolution: {integrity: sha512-JZOSA7Mo9sNGB8+UjSgzdLtokWAky1zbztM3WRLCbZ70/3cTANmQmOdR7y2g+J0e2WXywy1yS468tY+IruqEww==}
 
+  bootstrap-icons@1.13.1:
+    resolution: {integrity: sha512-ijombt4v6bv5CLeXvRWKy7CuM3TRTuPEuGaGKvTV5cz65rQSY8RQ2JcHt6b90cBBAC7s8fsf2EkQDldzCoXUjw==}
+
   bootstrap@5.3.8:
     resolution: {integrity: sha512-HP1SZDqaLDPwsNiqRqi5NcP0SSXciX2s9E+RyqJIIqGo+vJeN5AJVM98CXmW/Wux0nQ5L7jeWUdplCEf0Ee+tg==}
     peerDependencies:
@@ -3115,8 +3121,8 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
-  mazey@5.6.1:
-    resolution: {integrity: sha512-SUdUhwznqNdjiHrX6ADTr4MlTzhqFwYcCtTjtefnkM6NiD67U+8F4nDLlnxTF1El9m0toOJzziQApaxKrpuZMw==}
+  mazey@5.7.4:
+    resolution: {integrity: sha512-DZHMDnO6V9FYSaGuqFnGeSvVcY+yaCQN2tZAXrc7dPhGCaaKAKl7boXw+8m8EUm98MB4K75vcopmE45WFdJkYQ==}
 
   mdurl@2.1.0:
     resolution: {integrity: sha512-1+HBaOx0zi/dQWht8rNv9MYf9qqpqL/kxI0hXImU6Y547zM6Sni8BQibt7ifgMcYtQg41ao3Ivd6cnSM86inpg==}
@@ -6342,6 +6348,8 @@ snapshots:
 
   boolbase@1.0.0: {}
 
+  bootstrap-icons@1.13.1: {}
+
   bootstrap@5.3.8(@popperjs/core@2.11.8):
     dependencies:
       '@popperjs/core': 2.11.8
@@ -7923,7 +7931,7 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
-  mazey@5.6.1: {}
+  mazey@5.7.4: {}
 
   mdurl@2.1.0: {}
 

@@ -5,6 +5,14 @@
 declare module "copy-to-clipboard";
 
 declare module "mazey" {
+  export type ThemePreference = "system" | "light" | "dark";
+  export type ResolvedTheme = "light" | "dark";
+
+  export interface PreferenceResult<T> {
+    value: T;
+    label: string;
+  }
+
   export function throttle<TArgs extends unknown[], TResult>(
     fn: (...args: TArgs) => TResult,
     wait?: number,
@@ -16,6 +24,15 @@ declare module "mazey" {
   };
 
   export function isNonEmptyArray<T>(value: T[] | unknown): value is T[];
+
+  export function resolveThemePreference(
+    storageKey: string
+  ): PreferenceResult<ResolvedTheme>;
+
+  export function setThemePreference(
+    storageKey: string,
+    value: ThemePreference
+  ): boolean;
 }
 
 interface JQueryCollection {

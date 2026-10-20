@@ -2,7 +2,7 @@
 
 ## Scope and Runtime
 
-This repository publishes `mazey-wordpress-utils`, a browser-focused TypeScript utility library for modifying WordPress page markup. Work from this repository root and use Node.js 22 (`nvm use`) with npm, matching `.nvmrc`, `package.json`, the README, and CI. Preserve the current public API and the browser support targets in `.babelrc` unless a change explicitly requires otherwise.
+This repository publishes `mazey-wordpress-utils`, a browser-focused TypeScript utility library for modifying WordPress page markup. Work from this repository root and use Node.js 22 with npm, matching the README and CI. The repository does not pin a local Node.js version through `.nvmrc` or `package.json`. Preserve the current public API and the browser support targets in `.babelrc` unless a change explicitly requires otherwise.
 
 ## Repository Map
 
@@ -30,6 +30,8 @@ For local development, `npm run dev` starts Webpack Dev Server for the homepage 
 Callers pass selectors and URL-matching options into exported helpers. The helpers read `location`, query the live DOM, and mutate matching elements or attach event handlers. `setCopyBtn` sends extracted paragraph text to `copy-to-clipboard`; shared validation, logging, and throttling come from `mazey`. `setImgWidthHeight` is the only helper that expects a page-provided `window.jQuery` or `window.$`. `hideHeaderInTOC` retains module-level state so its scroll listener is installed only once.
 
 These APIs require browser globals when invoked. Keep imports free of new module-load DOM side effects, and test DOM behavior under jsdom. When public behavior changes, update source, declarations, tests, examples, and README usage together.
+
+The website theme controls expose only light and dark. `site/theme.ts` resolves the operating-system theme once when no explicit preference exists, persists only concrete `light` or `dark` selections through Mazey, and synchronizes Bootstrap, browser theme color, and TypeDoc state. Generated API pages retain TypeDoc's native Settings selector with only Light and Dark options.
 
 ## Configuration and Build Pipeline
 

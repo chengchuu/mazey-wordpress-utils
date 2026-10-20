@@ -1,6 +1,7 @@
 import "./api.css";
 import { initializePwa } from "./pwa";
-import { initializeTheme } from "./theme";
+import { SITE_RUNTIME_CONFIG } from "./runtime-config";
+import { initializeThemeControls } from "./theme";
 
-initializeTheme();
+initializeThemeControls(SITE_RUNTIME_CONFIG.themeStorageKey);
 initializePwa();

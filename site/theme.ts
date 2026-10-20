@@ -1,91 +1,97 @@
+import { resolveThemePreference, setThemePreference } from "mazey";
+import type { ResolvedTheme } from "mazey";
 import { SITE_RUNTIME_CONFIG } from "./runtime-config";
 
-type ThemePreference = "system" | "light" | "dark";
-type ResolvedTheme = "light" | "dark";
-
-function getThemeQuery(): MediaQueryList | null {
-  try {
-    return typeof window.matchMedia === "function"
-      ? window.matchMedia("(prefers-color-scheme: dark)")
-      : null;
-  } catch {
-    return null;
-  }
+function themeFromTypeDoc(value: string): ResolvedTheme | null {
+  return value === "light" || value === "dark" ? value : null;
 }
 
-const themeQuery = getThemeQuery();
+export function initializeThemeControls(storageKey: string): () => void {
+  const root = document.documentElement;
+  if (root.dataset.themeControlsReady === "true") return () => undefined;
 
-function isThemePreference(value: string | null): value is ThemePreference {
-  return value === "system" || value === "light" || value === "dark";
-}
+  let resolvedTheme: ResolvedTheme = resolveThemePreference(storageKey).value;
 
-function readPreference(): ThemePreference {
-  try {
-    const value = localStorage.getItem(SITE_RUNTIME_CONFIG.themeStorageKey);
-    return isThemePreference(value) ? value : "system";
-  } catch {
-    return "system";
-  }
-}
+  const apply = (theme: ResolvedTheme): void => {
+    resolvedTheme = theme;
+    root.dataset.bsTheme = theme;
+    root.dataset.theme = theme;
+    root.style.colorScheme = theme;
 
-function resolvedTheme(preference: ThemePreference): ResolvedTheme {
-  return preference === "system"
-    ? themeQuery?.matches
-      ? "dark"
-      : "light"
-    : preference;
-}
-
-function applyTheme(preference: ThemePreference): void {
-  const resolved = resolvedTheme(preference);
-  document.documentElement.dataset.bsTheme = resolved;
-  document.documentElement.dataset.theme = resolved;
-  document.documentElement.dataset.themePreference = preference;
-  document
-    .querySelectorAll<HTMLSelectElement>("[data-theme-select]")
-    .forEach(select => {
-      select.value = preference;
-    });
-  document
-    .querySelectorAll<HTMLMetaElement>("meta[name=\"theme-color\"][data-theme-color]")
-    .forEach(meta => {
-      meta.content = SITE_RUNTIME_CONFIG.themeColors[resolved];
-    });
-  try {
-    localStorage.setItem("tsd-theme", resolved === "dark" ? "dark" : "light");
-  } catch {
-    // TypeDoc theme synchronization is best-effort when storage is unavailable.
-  }
-}
-
-export function initializeTheme(): void {
-  let preference = readPreference();
-  applyTheme(preference);
-
-  document
-    .querySelectorAll<HTMLSelectElement>("[data-theme-select]")
-    .forEach(select => {
-      select.addEventListener("change", () => {
-        if (!isThemePreference(select.value)) return;
-        preference = select.value;
-        try {
-          localStorage.setItem(
-            SITE_RUNTIME_CONFIG.themeStorageKey,
-            preference
-          );
-        } catch {
-          // Applying the selected theme does not depend on persistence.
-        }
-        applyTheme(preference);
+    document
+      .querySelectorAll<HTMLMetaElement>(
+        "meta[name=\"theme-color\"][data-theme-color]"
+      )
+      .forEach(meta => {
+        meta.content = SITE_RUNTIME_CONFIG.themeColors[theme];
       });
-    });
 
-  const handleSystemThemeChange = () => {
-    if (preference === "system") applyTheme(preference);
+    try {
+      window.localStorage.setItem("tsd-theme", theme);
+    } catch {
+      // TypeDoc synchronization is optional when storage is unavailable.
+    }
+
+    const typeDocControl = document.getElementById("tsd-theme");
+    if (
+      typeDocControl instanceof HTMLSelectElement &&
+      typeDocControl.value !== theme
+    ) {
+      typeDocControl.value = theme;
+    }
+
+    const currentTheme = theme === "light" ? "Light" : "Dark";
+    const nextTheme = theme === "light" ? "dark" : "light";
+    document
+      .querySelectorAll<HTMLButtonElement>("[data-theme-toggle]")
+      .forEach(button => {
+        button.setAttribute(
+          "aria-label",
+          `Current theme: ${currentTheme}. Switch to ${nextTheme} theme.`
+        );
+        button
+          .querySelectorAll<SVGElement>("[data-theme-icon]")
+          .forEach(icon => {
+            icon.toggleAttribute("hidden", icon.dataset.themeIcon !== theme);
+          });
+      });
   };
-  if (typeof themeQuery?.addEventListener === "function") {
-    themeQuery.addEventListener("change", handleSystemThemeChange);
-  } else {
-    themeQuery?.addListener(handleSystemThemeChange);
-  }
+
+  const handleClick = (event: MouseEvent): void => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const button = target.closest<HTMLButtonElement>("[data-theme-toggle]");
+    if (!button) return;
+
+    const nextTheme: ResolvedTheme =
+      resolvedTheme === "light" ? "dark" : "light";
+    setThemePreference(storageKey, nextTheme);
+    apply(nextTheme);
+  };
+
+  const handleChange = (event: Event): void => {
+    const control = event.target;
+    if (!(control instanceof HTMLSelectElement) || control.id !== "tsd-theme") {
+      return;
+    }
+    const theme = themeFromTypeDoc(control.value);
+    if (!theme) {
+      apply(resolvedTheme);
+      return;
+    }
+
+    setThemePreference(storageKey, theme);
+    apply(theme);
+  };
+
+  root.dataset.themeControlsReady = "true";
+  apply(resolvedTheme);
+  document.addEventListener("click", handleClick);
+  document.addEventListener("change", handleChange);
+
+  return () => {
+    document.removeEventListener("click", handleClick);
+    document.removeEventListener("change", handleChange);
+    delete root.dataset.themeControlsReady;
+  };
 }
