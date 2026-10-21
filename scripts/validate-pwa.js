@@ -1,12 +1,23 @@
 "use strict";
 
-const { existsSync, readFileSync } = require("node:fs");
+const { existsSync, readFileSync, readdirSync, statSync } = require("node:fs");
 const path = require("node:path");
 const vm = require("node:vm");
+const { isDeepStrictEqual } = require("node:util");
 const projectConfig = require("../project.config");
 
 const docsDir = path.resolve(__dirname, "..", "docs");
 const failures = [];
+function htmlFiles(directory) {
+  return readdirSync(directory).flatMap(name => {
+    const file = path.join(directory, name);
+    return statSync(file).isDirectory()
+      ? htmlFiles(file)
+      : file.endsWith(".html")
+        ? [file]
+        : [];
+  });
+}
 
 function read(relativePath) {
   const file = path.join(docsDir, relativePath);
@@ -40,6 +51,9 @@ if (manifest) {
     ["512x512:any", [512, 512]],
     ["512x512:maskable", [512, 512]],
   ]);
+  if (!isDeepStrictEqual(manifest.icons, projectConfig.pwa.icons.map(({ file, ...icon }) => icon))) {
+    failures.push("manifest icons do not match configured files, sizes, types, and purposes");
+  }
   for (const icon of manifest.icons || []) {
     const key = `${icon.sizes}:${icon.purpose}`;
     const dimensions = requiredIcons.get(key);
@@ -74,6 +88,18 @@ for (const page of [
     failures.push(`${page}: theme-color metadata is missing`);
   }
 }
+for (const file of htmlFiles(docsDir)) {
+  const html = readFileSync(file, "utf8");
+  for (const forbidden of [
+    "data-pwa-update",
+    "data-pwa-update-now",
+    "pwa-update-notice",
+    "site-pwa-update",
+  ]) {
+    if (html.includes(forbidden))
+      failures.push(`${path.relative(docsDir, file)} contains removed update UI: ${forbidden}`);
+  }
+}
 
 const worker = read("service-worker.js").toString("utf8");
 try {
@@ -87,8 +113,8 @@ if (worker.includes("__BASE_PATH__") || worker.includes("__CACHE_NAME__")) {
 if (!worker.includes(`const BASE_PATH = "${projectConfig.site.basePath}"`)) {
   failures.push("service-worker.js scope guard does not match the Pages base");
 }
-if (!worker.includes('event.data.type === "SKIP_WAITING"')) {
-  failures.push("service-worker.js lacks explicit update activation handling");
+if (/SKIP_WAITING|skipWaiting\s*\(/.test(worker)) {
+  failures.push("service-worker.js contains forced update activation");
 }
 if (!worker.includes("networkFirst(request, BASE_PATH)")) {
   failures.push("service-worker.js navigation fallback is not the precached root");
@@ -108,7 +134,7 @@ for (const page of [
   const html = read(page).toString("utf8");
   const pageUrl = new URL(page.replace(/index\.html$/, ""), projectConfig.site.url);
   const assetReferences = [
-    ...html.matchAll(/(?:href|src)="([^"]+\.(?:css|js|png|svg|webmanifest))"/g),
+    ...html.matchAll(/(?:href|src)="([^"]+\.(?:css|js|png|jpe?g|svg|webmanifest))"/g),
   ].map(match => new URL(match[1], pageUrl));
   for (const asset of assetReferences) {
     if (
@@ -118,6 +144,16 @@ for (const page of [
     ) {
       failures.push(`${page}: app-shell asset is not precached: ${asset.pathname}`);
     }
+  }
+}
+
+for (const file of projectConfig.assetFiles) {
+  const delivered = read(`images/${file}`);
+  if (!delivered.equals(readFileSync(path.resolve(__dirname, "..", "images", file)))) {
+    failures.push(`${file}: supplied image bytes were changed`);
+  }
+  if (!appShell.includes(`${projectConfig.site.basePath}images/${file}`)) {
+    failures.push(`${file}: supplied image is not precached`);
   }
 }
 

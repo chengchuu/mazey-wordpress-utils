@@ -11,13 +11,13 @@ This repository publishes `mazey-wordpress-utils`, a browser-focused TypeScript 
 - `project.config.js` centralizes package-derived site identity, routes, SEO, theme, and PWA settings.
 - `site/` contains the homepage, shared navigation/theme/PWA modules, API enhancements, styles, and service-worker source.
 - `playground/` contains the crawlable interactive browser example.
-- `images/` contains handwritten source artwork; Pages assembly generates raster PWA/social assets.
+- `images/` contains supplied website, PWA, and social artwork. Webpack and Pages assembly copy the configured raster assets unchanged; `logo.svg` remains an unused source file.
 - `test/default.test.js` contains Jest/jsdom behavior tests for the public utilities.
 - `test/site-build.test.js` covers project configuration and deterministic TypeDoc/Pages transformations; `test/site-runtime.test.js` covers browser theme, navigation, and PWA behavior.
 - `typing.d.ts` supplies local declarations for dependencies and browser globals used by the source.
 - `scripts/` contains package-name helpers, Webpack configuration, deterministic Pages assembly, preview, and final-artifact validation.
 - `.github/workflows/publish-npm.yml` tests pull requests and publishes release branches.
-- `lib/`, `dist-dev/`, `.pages-api/`, `docs/`, and `coverage/` are generated, ignored outputs. Do not edit them by hand. The root `index.js` is a legacy placeholder, not the package or build entrypoint.
+- `lib/`, `dist-dev/`, `.pages-api/`, `docs/`, and `coverage/` are generated, ignored outputs. Do not edit them by hand.
 
 ## Entry Points and Startup Flow
 
@@ -43,7 +43,7 @@ The website theme controls expose only light and dark. `site/theme.ts` resolves 
 - `.babelrc` defines browser transpilation and usage-based `core-js` transforms.
 - `.eslintrc`, `.eslintignore`, `.editorconfig`, and `.lintstagedrc` define source style and staged-file linting.
 - `commitlint.config.js` and `.husky/` enforce Conventional Commit messages and pre-commit linting.
-- `.npmignore`, `.gitignore`, and `package.json` control generated, repository, and published package boundaries.
+- `.gitignore` controls repository exclusions; the `files` allowlist in `package.json` controls published package contents.
 
 ## Contributor Workflow
 

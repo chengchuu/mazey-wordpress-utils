@@ -6,7 +6,6 @@ interface InstallPromptEvent extends Event {
 }
 
 let installPrompt: InstallPromptEvent | null = null;
-let refreshing = false;
 
 function setStatus(message: string): void {
   document.querySelectorAll<HTMLElement>("[data-pwa-status]").forEach(status => {
@@ -42,21 +41,6 @@ function isStandalone(): boolean {
   );
 }
 
-function showUpdate(registration: ServiceWorkerRegistration): void {
-  const notice = document.querySelector<HTMLElement>("[data-pwa-update]");
-  const button = notice?.querySelector<HTMLButtonElement>(
-    "[data-pwa-update-now]"
-  );
-  if (!notice || !button || !registration.waiting) return;
-  notice.hidden = false;
-  setStatus("A website update is ready.");
-  button.onclick = () => {
-    button.disabled = true;
-    setStatus("Updating the website…");
-    registration.waiting?.postMessage({ type: "SKIP_WAITING" });
-  };
-}
-
 async function registerWorker(): Promise<void> {
   const { pwa } = SITE_RUNTIME_CONFIG;
   if (
@@ -69,19 +53,10 @@ async function registerWorker(): Promise<void> {
   }
 
   try {
-    const registration = await navigator.serviceWorker.register(
+    await navigator.serviceWorker.register(
       pwa.serviceWorkerUrl,
       { scope: pwa.scope }
     );
-    if (registration.waiting) showUpdate(registration);
-    registration.addEventListener("updatefound", () => {
-      const worker = registration.installing;
-      worker?.addEventListener("statechange", () => {
-        if (worker.state === "installed" && navigator.serviceWorker.controller) {
-          showUpdate(registration);
-        }
-      });
-    });
   } catch {
     setStatus("Offline support could not be enabled in this browser.");
   }
@@ -125,11 +100,6 @@ export function initializePwa(): void {
       });
     });
 
-  navigator.serviceWorker?.addEventListener("controllerchange", () => {
-    if (refreshing) return;
-    refreshing = true;
-    location.reload();
-  });
   window.addEventListener("load", () => {
     if (typeof window.requestIdleCallback === "function") {
       window.requestIdleCallback(() => void registerWorker());

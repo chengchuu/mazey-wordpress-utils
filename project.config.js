@@ -63,9 +63,11 @@ const pages = {
   },
 };
 const assets = {
-  faviconFile: "logo.svg",
-  logoFile: "logo.svg",
-  openGraphImageFile: "open-graph-1200x630.png",
+  faviconFile: "logo-32x32.png",
+  faviconType: "image/png",
+  logoFile: "logo-192x192.png",
+  appleTouchIconFile: "logo-apple-touch-180x180.png",
+  openGraphImageFile: "logo-open-graph-1200x630.jpg",
 };
 const software = {
   "@type": "SoftwareSourceCode",
@@ -95,7 +97,16 @@ module.exports = deepFreeze({
     ...assets,
     faviconUrl: `${basePath}images/${assets.faviconFile}`,
     logoUrl: `${basePath}images/${assets.logoFile}`,
+    appleTouchIconUrl: `${basePath}images/${assets.appleTouchIconFile}`,
   },
+  assetFiles: [
+    assets.faviconFile,
+    assets.logoFile,
+    "logo-512x512.png",
+    assets.appleTouchIconFile,
+    "logo-maskable-512x512.png",
+    assets.openGraphImageFile,
+  ],
   site: {
     url: siteUrl.href,
     basePath,
@@ -110,7 +121,7 @@ module.exports = deepFreeze({
       url: new URL(`images/${assets.openGraphImageFile}`, siteUrl).href,
       width: 1200,
       height: 630,
-      type: "image/png",
+      type: "image/jpeg",
       alt: `${displayName} browser utilities for WordPress markup.`,
     },
     rootJsonLd: {
@@ -144,22 +155,22 @@ module.exports = deepFreeze({
       "Installable project website, playground, and API documentation for mazey-wordpress-utils.",
     icons: [
       {
-        file: "icon-192.png",
-        src: `${basePath}images/icon-192.png`,
+        file: "logo-192x192.png",
+        src: `${basePath}images/logo-192x192.png`,
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        file: "icon-512.png",
-        src: `${basePath}images/icon-512.png`,
+        file: "logo-512x512.png",
+        src: `${basePath}images/logo-512x512.png`,
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        file: "icon-maskable-512.png",
-        src: `${basePath}images/icon-maskable-512.png`,
+        file: "logo-maskable-512x512.png",
+        src: `${basePath}images/logo-maskable-512x512.png`,
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

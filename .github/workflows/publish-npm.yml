@@ -4,12 +4,10 @@ env:
   NODE_VERSION: '22'
 
 on:
-  # Test
   pull_request:
     branches:
       - main
       - 'release/v*'
-  # Publish
   push:
     branches:
       - 'release/v*'
@@ -78,7 +76,7 @@ jobs:
       - name: Get package version
         id: package-version
         run: echo "version=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
-        
+
       - name: Create git tag
         if: success()
         run: |

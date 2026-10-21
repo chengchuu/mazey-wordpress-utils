@@ -14,6 +14,8 @@ const { openGraphImage } = projectConfig.seo;
 const templateParameters = {
   DISPLAY_NAME: projectConfig.brand.displayName,
   FAVICON_URL: `${pagesBase}images/${projectConfig.assets.faviconFile}`,
+  FAVICON_TYPE: projectConfig.assets.faviconType,
+  APPLE_TOUCH_ICON_URL: `${pagesBase}images/${projectConfig.assets.appleTouchIconFile}`,
   GITHUB_URL: projectConfig.urls.github,
   INSTALL_COMMAND: projectConfig.package.installCommand,
   LICENSE_URL: projectConfig.urls.license,
@@ -68,7 +70,7 @@ const runtimeConfig = {
 module.exports = {
   mode: "development",
   entry: {
-    shared: [resolve("../site/shared.ts"), resolve("../images/logo.svg")],
+    shared: [resolve("../site/shared.ts"), ...projectConfig.assetFiles.map(file => resolve(`../images/${file}`))],
     home: {
       import: resolve("../site/index.ts"),
       dependOn: "shared",
@@ -109,7 +111,7 @@ module.exports = {
         use: [MiniCssExtractPlugin.loader, "css-loader"],
       },
       {
-        test: /\.svg$/i,
+        test: /\.(?:png|jpe?g|svg)$/i,
         type: "asset/resource",
         generator: {
           filename: "images/[name][ext]",
